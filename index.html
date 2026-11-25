@@ -102,16 +102,18 @@ summary{cursor:pointer;font-weight:600;padding:10px 0;min-height:44px;display:fl
       </div>
       <div id="extras"></div>
       <button type="button" class="add" id="addExtra">+ Add another charge</button>
-      <label for="po">Jiffy Junk job # or PO # <span class="opt">(optional)</span></label>
-      <input id="po" placeholder="Only if Jiffy Junk gave you one">
-      <p class="hint">PO means Purchase Order. It helps Jiffy Junk match your invoice to the job.</p>
-      <label for="notes">Notes <span class="opt">(optional)</span></label>
-      <textarea id="notes" rows="2" placeholder="Anything else Jiffy Junk should know"></textarea>
+      <details>
+        <summary>Job number or notes (optional)</summary>
+        <label for="po">Jiffy Junk job # or PO #</label>
+        <input id="po" placeholder="Only if Jiffy Junk gave you one">
+        <label for="notes">Notes</label>
+        <textarea id="notes" rows="2" placeholder="Anything else Jiffy Junk should know"></textarea>
+      </details>
     </section>
 
     <section class="step">
       <h2><span class="n">2</span>Your info</h2>
-      <p class="hint">Saved on this device, so you only type it once.</p>
+      <p class="hint">Already filled in and saved on this phone. Tap to change it.</p>
       <details id="me">
         <summary>Your company, name, phone and PayPal</summary>
         <label for="co">Company name</label><input id="co" autocomplete="organization">
@@ -140,24 +142,20 @@ summary{cursor:pointer;font-weight:600;padding:10px 0;min-height:44px;display:fl
     <section class="step send">
       <h2><span class="n">4</span>Send it</h2>
       <a class="btn" id="mailBtn" href="mailto:ap@jiffyjunk.com">Open email with invoice filled in</a>
-      <p class="hint">It goes to <span class="addr">ap@jiffyjunk.com</span>. Nothing is sent until you press Send in your email. Want to include before and after photos? Attach them to the same email.</p>
+      <p class="hint">Your email opens with everything filled in, addressed to <span class="addr">ap@jiffyjunk.com</span>. To add before and after photos, tap the paperclip. Then press Send.</p>
       <p class="msg" id="msg" role="status"></p>
-      <p class="hint" style="margin-top:14px"><b>Email didn't open?</b> Try one of these:</p>
-      <div class="alt">
-        <a class="btn2" id="gmailBtn" href="https://mail.google.com/" target="_blank" rel="noopener noreferrer">Open in Gmail</a>
-        <button type="button" class="btn2" id="copyBtn">Copy invoice</button>
-        <button type="button" class="btn2" id="copyAddr">Copy email address</button>
-      </div>
-      <textarea id="copyBox" readonly aria-label="Invoice text to copy"></textarea>
-      <div id="pdfWrap">
+      <details>
+        <summary>Email didn't open? Other options</summary>
+        <div class="alt"><button type="button" class="btn2" id="copyBtn">Copy invoice to paste in an email</button></div>
+        <textarea id="copyBox" readonly aria-label="Invoice text to copy"></textarea>
         <div class="alt"><button type="button" class="btn2" id="pdfBtn">Save or share a PDF copy</button></div>
         <p class="msg" id="pdfMsg" role="status"></p>
-      </div>
+      </details>
       <div class="new">
         <button type="button" class="btn2" id="newBtn" style="width:100%">Start a new invoice</button>
         <p class="hint">Clears the job and keeps your info.</p>
       </div>
-      <p class="hint tip"><b>Tip:</b> keep this page one tap away. On iPhone, tap the Share button in Safari, then <b>Add to Home Screen</b>. On Android, tap the three-dot menu in Chrome, then <b>Add to Home screen</b>.</p>
+      <p class="hint tip"><b>Tip:</b> keep this page one tap away. In Chrome, tap the three-dot menu, then <b>Add to Home screen</b>.</p>
     </section>
   </aside>
 </main>
@@ -248,7 +246,6 @@ function render() {
   if (lastTotal !== null && t !== lastTotal) $('tot').classList.add('flash');
   lastTotal = t;
   $('mailBtn').href = 'mailto:' + AP + '?subject=' + encodeURIComponent(subject()) + '&body=' + encodeURIComponent(body().replace(/\n/g, '\r\n'));
-  $('gmailBtn').href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(AP) + '&su=' + encodeURIComponent(subject()) + '&body=' + encodeURIComponent(body());
   if (document.activeElement !== $('invNo')) $('invNo').value = invNo();
   $('presetNote').hidden = !s.preset;
   save();
@@ -274,8 +271,7 @@ $('extras').addEventListener('input', e => { const el = e.target; if (el.dataset
 $('extras').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; s.extras.splice(+b.dataset.rm, 1); renderExtras(); render(); });
 $('addExtra').addEventListener('click', () => { s.extras.push({ d: '', a: '' }); renderExtras(); render(); const ins = $('extras').querySelectorAll('input[data-k="d"]'); ins[ins.length - 1].focus(); });
 
-$('mailBtn').addEventListener('click', e => { if (!blockIfMissing(e)) say('Your email app should open with everything filled in. Check it, then press Send. If nothing opened, use one of the buttons below.'); });
-$('gmailBtn').addEventListener('click', e => { if (!blockIfMissing(e)) say('Gmail should open with everything filled in. Check it, then press Send.'); });
+$('mailBtn').addEventListener('click', e => { if (!blockIfMissing(e)) say('Your email should open with everything filled in. Check it, then press Send. If nothing opened, tap "Email didn\'t open?" below.'); });
 
 function showCopyBox(t, how) { const b = $('copyBox'); b.value = t; b.style.display = 'block'; b.focus(); b.select(); say(how); }
 $('copyBtn').addEventListener('click', () => {
@@ -284,10 +280,6 @@ $('copyBtn').addEventListener('click', () => {
   $('copyBox').style.display = 'none';
   try { navigator.clipboard.writeText(t).then(() => say(next), () => showCopyBox(t, 'Press and hold inside the box below, tap Select All, then Copy. Paste it into an email to ap@jiffyjunk.com.')); }
   catch (e) { showCopyBox(t, 'Press and hold inside the box below, tap Select All, then Copy. Paste it into an email to ap@jiffyjunk.com.'); }
-});
-$('copyAddr').addEventListener('click', () => {
-  try { navigator.clipboard.writeText(AP).then(() => say('Copied ap@jiffyjunk.com'), () => say('The address is ap@jiffyjunk.com')); }
-  catch (e) { say('The address is ap@jiffyjunk.com'); }
 });
 
 let armed = false, armT;
@@ -356,7 +348,7 @@ $('pdfBtn').addEventListener('click', async () => {
 });
 
 fill(); renderExtras();
-$('me').open = !(s.nm.trim() && s.ph.trim());
+$('me').open = !(s.ph.trim() && (s.pp.trim() || s.em.trim()));
 render();
 }
 </script>
