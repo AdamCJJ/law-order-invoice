@@ -141,9 +141,9 @@ summary{cursor:pointer;font-weight:600;padding:10px 0;min-height:44px;display:fl
 
     <section class="step send">
       <h2><span class="n">4</span>Send it</h2>
-      <a class="btn" id="mailBtn" href="mailto:ap@jiffyjunk.com">Open email with invoice filled in</a>
-      <a class="btn2" id="gmailApp" href="googlegmail:///co" style="width:100%;margin-top:8px">Use the Gmail app instead</a>
-      <p class="hint">Your email opens with everything filled in, addressed to <span class="addr">ap@jiffyjunk.com</span>. To add before and after photos, tap the photo or paperclip button in your email. Then press Send.</p>
+      <a class="btn" id="gmailApp" href="googlegmail:///co">Open Gmail with invoice filled in</a>
+      <a class="btn2" id="mailBtn" href="mailto:ap@jiffyjunk.com" style="width:100%;margin-top:8px">Use iPhone Mail instead</a>
+      <p class="hint">Gmail opens with everything filled in, addressed to <span class="addr">ap@jiffyjunk.com</span>. If your iPhone asks to open Gmail, tap Open. To add before and after photos, tap the paperclip. Then press Send.</p>
       <p class="msg" id="msg" role="status"></p>
       <details>
         <summary>Email didn't open? Other options</summary>
@@ -273,8 +273,8 @@ $('extras').addEventListener('input', e => { const el = e.target; if (el.dataset
 $('extras').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; s.extras.splice(+b.dataset.rm, 1); renderExtras(); render(); });
 $('addExtra').addEventListener('click', () => { s.extras.push({ d: '', a: '' }); renderExtras(); render(); const ins = $('extras').querySelectorAll('input[data-k="d"]'); ins[ins.length - 1].focus(); });
 
-$('mailBtn').addEventListener('click', e => { if (!blockIfMissing(e)) say('Your email should open with everything filled in. Check it, then press Send. If nothing opened, try the Gmail button or tap "Email didn\'t open?" below.'); });
-$('gmailApp').addEventListener('click', e => { if (!blockIfMissing(e)) say('If your iPhone asks to open Gmail, tap Open. Check the email, then press Send. If the email is empty, use "Email didn\'t open?" below.'); });
+$('mailBtn').addEventListener('click', e => { if (!blockIfMissing(e)) say('Mail should open with everything filled in. Check it, then press Send. If nothing opened, tap "Email didn\'t open?" below.'); });
+$('gmailApp').addEventListener('click', e => { if (!blockIfMissing(e)) say('Gmail should open with everything filled in. Check it, then press Send. If the email is empty, close Gmail, come back here and tap the blue button again, or use "Email didn\'t open?" below.'); });
 
 function showCopyBox(t, how) { const b = $('copyBox'); b.value = t; b.style.display = 'block'; b.focus(); b.select(); say(how); }
 $('copyBtn').addEventListener('click', () => {
